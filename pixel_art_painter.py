@@ -60,7 +60,7 @@ class PixelArtPainter:
         pixel_size_frame = ttk.Frame(settings_window)
         pixel_size_label = ttk.Label(pixel_size_frame, text="Pixel size:")
         pixel_size_label.pack(side="left")
-        pixel_size_options = [("10", 10), ("20", 20), ("30", 30)]
+        pixel_size_options = [("10", 10), ("15", 15), ("20", 20), ("30", 30)]
         pixel_size_var = tk.StringVar(settings_window, str(self.pixel_size))
         pixel_size_menu = ttk.OptionMenu(pixel_size_frame, pixel_size_var, *pixel_size_options)
         pixel_size_menu.pack(side="left")
@@ -86,12 +86,11 @@ class PixelArtPainter:
     def draw_grid(self):
         for x in range(0, self.canvas_width, self.pixel_size):
             for y in range(0, self.canvas_height, self.pixel_size):
-                self.canvas.create_rectangle(x, y, x + self.pixel_size, y + self.pixel_size, outline="gray")
+                self.canvas.create_rectangle(x, y, x + self.pixel_size, y + self.pixel_size, outline="gray", tags="gridline")
 
     def draw_pixel(self, event):
         x = event.x // self.pixel_size * self.pixel_size
         y = event.y // self.pixel_size * self.pixel_size
-        self.pixels.append((x, y, self.color))
         self.canvas.create_rectangle(x, y, x + self.pixel_size, y + self.pixel_size, fill=self.color)
         
     def draw_pixels(self):
@@ -104,8 +103,9 @@ class PixelArtPainter:
         items = self.canvas.find_overlapping(x - radius, y - radius, x + radius, y + radius)
         for item in items:
             if item != self.clear_button and item != self.color_button:
-                self.canvas.delete(item)
-        self.draw_grid()
+                if "gridline" not in self.canvas.gettags(item):
+                    self.canvas.delete(item)
+        #self.draw_grid()
         
     
     def save_project(self):
