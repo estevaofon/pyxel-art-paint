@@ -27,6 +27,7 @@ class PixelArtPainter:
         self.file_menu.add_command(label="Export", command=self.save_image)
         self.file_menu.add_command(label="Open Projetct", command=self.open_project)
         self.file_menu.add_command(label="Save Projetct", command=self.save_project)
+        self.file_menu.add_command(label="Settings", command=self.settings)
 
         self.canvas = tk.Canvas(self.master, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
@@ -40,8 +41,48 @@ class PixelArtPainter:
         self.color_button.pack(side="left")    
         self.draw_grid()
         self.pixels = []
-        
-        # draw grid
+
+    def settings(self):
+        settings_window = tk.Toplevel(self.master)
+        settings_window.title("Settings")
+
+        # canvas size
+        canvas_size_frame = ttk.Frame(settings_window)
+        canvas_size_label = ttk.Label(canvas_size_frame, text="Canvas size:")
+        canvas_size_label.pack(side="left")
+        canvas_size_options = [("300x300", 300), ("500x500", 500), ("700x700", 700)]
+        canvas_size_var = tk.StringVar(settings_window, f"{self.canvas_width}x{self.canvas_height}")
+        canvas_size_menu = ttk.OptionMenu(canvas_size_frame, canvas_size_var, *canvas_size_options)
+        canvas_size_menu.pack(side="left")
+        canvas_size_frame.pack(pady=10)
+
+        # pixel size
+        pixel_size_frame = ttk.Frame(settings_window)
+        pixel_size_label = ttk.Label(pixel_size_frame, text="Pixel size:")
+        pixel_size_label.pack(side="left")
+        pixel_size_options = [("10", 10), ("20", 20), ("30", 30)]
+        pixel_size_var = tk.StringVar(settings_window, str(self.pixel_size))
+        pixel_size_menu = ttk.OptionMenu(pixel_size_frame, pixel_size_var, *pixel_size_options)
+        pixel_size_menu.pack(side="left")
+        pixel_size_frame.pack(pady=10)
+
+        # apply button
+        apply_button = ttk.Button(settings_window, text="Apply",
+                                  command=lambda: self.apply_settings(canvas_size_var.get(), pixel_size_var.get()))
+        apply_button.pack()
+
+    def apply_settings(self, canvas_size, pixel_size):
+        size = int(canvas_size.replace(")", "").split(" ")[-1])
+        width, height = size, size
+        self.canvas_width = width
+        self.canvas_height = height
+        self.canvas.config(width=self.canvas_width, height=self.canvas_height)
+        self.clear_canvas()
+        self.master.geometry(f"{self.canvas_width}x{self.canvas_height+ 30}")
+        # update pixel size
+        self.pixel_size = int(pixel_size.replace(")", "").split(" ")[-1])
+        self.clear_canvas()
+
     def draw_grid(self):
         for x in range(0, self.canvas_width, self.pixel_size):
             for y in range(0, self.canvas_height, self.pixel_size):
